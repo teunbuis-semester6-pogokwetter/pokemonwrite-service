@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pogokwetter
+  labels:
+    name: pogokwetter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pokemonwrite-service
+  namespace: pogokwetter
+  labels:
+    app: pokemonwrite-service
+    tier: backend
+spec:
+  ports:
+    - port: 8086
+      targetPort: 8086
+  selector:
+    app: pokemonwrite-service
+    tier: backend
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pokemonwrite-service
+  namespace: pogokwetter
+spec:
+  selector:
+    matchLabels:
+      app: pokemonwrite-service
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pokemonwrite-service
+        tier: backend
+    spec:
+      containers:
+        - name: pokemonwrite-service
+          image: ghcr.io/teunbuis-semester6-pogokwetter/pokemonwrite-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8086
+---
