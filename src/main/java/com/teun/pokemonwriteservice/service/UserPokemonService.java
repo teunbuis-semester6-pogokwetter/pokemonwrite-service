@@ -1,37 +1,66 @@
 package com.teun.pokemonwriteservice.service;
 
 import com.teun.pokemonwriteservice.dto.UserPokemonDTO;
-import com.teun.pokemonwriteservice.models.UserPokemon;
+import com.teun.pokemonwriteservice.rabbitmq.Publisher;
 import com.teun.pokemonwriteservice.repo.UserPokemonRepo;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserPokemonService {
-
-    private static final String FROM_DATABASE = "[ 🌟 ] Retreived pokemon from database [ 🌟 ]";
     @Autowired
     UserPokemonRepo repo;
+
     @Autowired
-    ModelMapper modelMapper;
+    Publisher publisher;
 
     Logger logger = LoggerFactory.getLogger(UserPokemonService.class);
 
-    @CachePut(value = "userPokemon", key ="#userId")
-    public UserPokemonDTO saveUserPokemon(UserPokemonDTO userPokemonDTO, long userId){
-        return saveUserPokemonToDatabase(userPokemonDTO);
+
+    public void deleteUserPokemon(UserPokemonDTO userPokemonDTO){
+        deleteUserPokemonFromDataBase(userPokemonDTO);
+        publisher.publishUserPokemonDTODelete(userPokemonDTO);
+    }
+    public void deleteAllUserPokemonByUserId(Long userId){
+
+        deleteAllUserPokemonByUserIdFromDatabase(userId);
+    }
+    public String updateUserPokemon(UserPokemonDTO userPokemonDTO){
+        return updateUserPokemonInDatabase(userPokemonDTO);
+    }
+
+    public UserPokemonDTO saveUserPokemon(UserPokemonDTO userPokemonDTO){
+        UserPokemonDTO saved = saveUserPokemonToDatabase(userPokemonDTO);
+        if(saved != null){
+            publisher.publishUserPokemonDTO(saved);
+        }
+        return saved;
     }
     private UserPokemonDTO saveUserPokemonToDatabase(UserPokemonDTO userPokemonDTO){
-        UserPokemon toSave = modelMapper.map(userPokemonDTO, UserPokemon.class);
-        UserPokemon savedUserPokemon = repo.save(toSave);
+        UserPokemonDTO savedUserPokemon = repo.save(userPokemonDTO);
         logger.info("[ 🌟 ] Saved userpokemon to database [ 🌟 ]");
-        return modelMapper.map(savedUserPokemon, UserPokemonDTO.class);
+        return savedUserPokemon;
+    }
+    private void deleteUserPokemonFromDataBase(UserPokemonDTO userPokemonDTO){
+        repo.delete(userPokemonDTO);
+    }
+    private void deleteAllUserPokemonByUserIdFromDatabase(Long userId){
+        repo.deleteAllByUserId(userId);
+    }
+    private String updateUserPokemonInDatabase(UserPokemonDTO userPokemonDTO){
+        UserPokemonDTO toUpdate = repo.findByUserId(userPokemonDTO.getUserId()).orElse(null);
+        if(toUpdate != null){
+            repo.save(userPokemonDTO);
+            logger.info("Updated");
+            return "Updated";
+        }
+        else{
+            logger.info("No UserPokemon Could Be Found");
+            return "Could not Update";
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.teun.pokemonwriteservice.service;
 
+import com.teun.pokemonwriteservice.dto.PokemonDTO;
 import com.teun.pokemonwriteservice.repo.PokemonRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,4 +16,22 @@ public class PokemonService {
     @Autowired
     PokemonRepo repo;
     Logger logger = LoggerFactory.getLogger(PokemonService.class);
+
+    public PokemonDTO savePokemonToDatabase(PokemonDTO pokemonDTO){
+        return repo.save(pokemonDTO);
+    }
+    public void deletePokemonFromDatabase(PokemonDTO pokemonDTO){
+        repo.delete(pokemonDTO);
+    }
+    public void updatePokemonToDatabase(PokemonDTO pokemonDTO){
+        if(repo.findByDexNumber(pokemonDTO.getDexNumber()).isPresent()){
+            repo.save(pokemonDTO);
+        }
+        else{
+            logger.info("Could Not Update Pokemon");
+        }
+
+    }
+
+
 }

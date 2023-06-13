@@ -10,7 +10,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document(collection = "pokemon")
 public class Pokemon implements Serializable {
 
     //fields

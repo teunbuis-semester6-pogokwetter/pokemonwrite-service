@@ -11,7 +11,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document(collection = "userpokemon")
 public class UserPokemon implements Serializable {
 
     private Long pokemonId;
