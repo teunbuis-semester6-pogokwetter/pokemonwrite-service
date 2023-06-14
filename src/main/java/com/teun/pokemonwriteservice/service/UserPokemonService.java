@@ -63,4 +63,12 @@ public class UserPokemonService {
             return "Could not Update";
         }
     }
+
+    public void deleteUserPokemonByUserId(Long userId) {
+        deleteUserPokemonFromDataBaseByUserId(userId);
+    }
+
+    private void deleteUserPokemonFromDataBaseByUserId(Long userId) {
+        repo.deleteAllByUserId(userId);
+    }
 }
