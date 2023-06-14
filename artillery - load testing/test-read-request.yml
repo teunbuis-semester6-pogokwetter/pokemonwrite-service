@@ -1,0 +1,25 @@
+config:
+  target: "http://127.0.0.1:60039"
+  phases:
+    - name: Warmup 😮‍💨
+      duration: 60
+      arrivalRate: 10
+      rampTo: 20
+    - name: Ramp up to peak ⬆️
+      duration: 60
+      arrivalRate: 20
+      rampTo: 200
+    - name: Sustain peak 🔥
+      duration: 60
+      rampTo: 200
+scenarios:
+  - name: get userpokemons
+    flow:
+      - get:
+          url: "/api/userpokemonread/userid/1"
+      - get:
+          url: "/api/userpokemonread/userid/2"
+      - get:
+          url: "/api/userpokemonread/userid/3"
+      - get:
+          url: "/api/userpokemonread/all"

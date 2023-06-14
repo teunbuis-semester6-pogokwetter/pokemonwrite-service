@@ -1,0 +1,22 @@
+config:
+  target: "http://127.0.0.1:65391"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 50
+    - duration: 300
+      rampTo: 50
+scenarios:
+  - name: get userpokemons
+    flow:
+      - get:
+          url: "/api/userpokemonread/userid/1"
+      - get:
+          url: "/api/userpokemonread/userid/2"
+      - get:
+          url: "/api/userpokemonread/userid/3"
+      - get:
+          url: "/api/userpokemonread/all"
